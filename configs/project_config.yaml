@@ -1,0 +1,28 @@
+project_name: dataset-description-generation
+
+v1_scope:
+  sources:
+    - nyc_open_data
+    - data_gov
+  dataset_type: tabular
+  dataset_count_min: 20
+  dataset_count_max: 50
+  description_type: user_focused
+
+storage:
+  raw_api_dir: data/raw
+  metadata_dir: data/metadata
+  profiles_dir: data/profiles
+  descriptions_dir: data/descriptions
+
+execution:
+  engine: pyspark
+  platform: nyu_dataproc
+
+sampling:
+  sample_rows_per_dataset: 20
+
+output_schema:
+  normalized_metadata_format: parquet
+  profiles_format: parquet
+  descriptions_format: json
