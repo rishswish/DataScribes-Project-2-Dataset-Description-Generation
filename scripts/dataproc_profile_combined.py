@@ -85,7 +85,7 @@ def main():
     )
 
     input_path = "hdfs:///user/rbp5812_nyu_edu/data/metadata/combined_metadata_with_samples.parquet"    
-    output_path = "data/profiles/combined_profiles_spark.parquet"
+    output_path = "hdfs:///user/rbp5812_nyu_edu/data/profiles/combined_profiles_spark.parquet"
 
     df = spark.read.parquet(input_path)
 
