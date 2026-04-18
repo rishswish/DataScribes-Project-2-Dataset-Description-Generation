@@ -74,3 +74,4 @@ nosetests.xml
 # Model
 *.pt
 **/*.pt
+data/output/
