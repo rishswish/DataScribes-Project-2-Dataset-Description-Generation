@@ -168,11 +168,11 @@ Then open `http://localhost:8888` and run `notebooks/autoddg_pipeline_hpc.ipynb`
 
 ## Course Information
 
-- **Course**: Big Data (NYU Tandon)
+- **Course**: Big Data 
 - **Instructor**: Professor Juliana Freire
 - **Section Leader**: Dr. Christos Koutras
 - **Team**: DataScribes
-- **Members**: Rishabh Patil (rbp5812), Kund Meghani (km6579), Aditya Taware (at6370)
+- **Members**: Rishabh Patil (rbp5812)
 
 ---
 
