@@ -1,0 +1,4 @@
+source,rouge1,rouge2,rougeL,meteor,bertscore_f1
+nyc_open_data,0.351,0.1038,0.198,0.2875,0.8507
+data_gov,0.3778,0.1335,0.2302,0.2955,0.8684
+OVERALL,0.3647,0.119,0.2145,0.2916,0.8598

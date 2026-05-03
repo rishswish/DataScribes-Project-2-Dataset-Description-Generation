@@ -1,0 +1,201 @@
+dataset_id,source,title,success,error_type,original_word_count,generated_word_count,generated_sentence_count,follows_length_guideline,novelty_score,title_coverage
+aq7i-eu5q,nyc_open_data,FloodNet: Street Flooding Events Measured by FloodNet Sensors,True,,176,116,4,True,0.602,True
+ag7h-2pg6,nyc_open_data,Floodnet: Sensor Deployment Metadata,True,,23,89,4,True,0.803,True
+kb2e-tjy3,nyc_open_data,FloodNet: Sensor Deployment Metadata,True,,116,107,4,True,0.679,True
+6ztr-wgff,nyc_open_data,Transit Zones,False,rate_limit,173,0,0,False,0.0,False
+vhqf-adkz,nyc_open_data,Greater Transit Zone,False,prompt_too_long,153,0,0,False,0.0,False
+gs9u-q4vv,nyc_open_data,DEP Green Infrastructure Map (Point Layer),True,,110,109,4,True,0.585,True
+ndvb-mprk,nyc_open_data,DEP Green Infrastructure Map (Regulated Projects),True,,121,102,4,True,0.593,True
+p7iz-d7br,nyc_open_data,DEP Green Infrastructure Map (Porous Pavement Right of Way Practices),True,,148,88,3,True,0.514,True
+kcqe-vnci,nyc_open_data,NYC Parks Active and Passive Recreation,True,,269,109,4,True,0.5,True
+gcnt-k7eq,nyc_open_data,Firefighter Probationary School Results Admissions and Graduation Statistics,True,,49,110,4,True,0.765,True
+https://data.iowa.gov/api/views/qu5a-5eu4,data_gov,Iowa School Performance Profiles,True,,128,92,4,True,0.563,True
+https://data.cdc.gov/api/views/bi63-dtpu,data_gov,NCHS - Leading Causes of Death: United States,True,,228,129,6,False,0.481,True
+https://data.cityofnewyork.us/api/views/h9gi-nx95,data_gov,Motor Vehicle Collisions - Crashes,True,,414,78,4,True,0.5,True
+TSA-79246a29-1862-4212-a26e-efc0c0828d6c,data_gov,Global Terrorism Database,True,,60,93,4,True,0.676,True
+https://data.cdc.gov/api/views/cf5u-bm9w,data_gov,Monthly Rates of Laboratory-Confirmed COVID-19 Hospitalizations from the COVID-NET Surveillance System,True,,120,106,5,True,0.72,True
+https://data.cdc.gov/api/views/55yu-xksw,data_gov,Heart Disease Mortality Data Among US Adults (35+) by State/Territory and County – 2019-2021,True,,46,94,6,False,0.657,True
+c935e71d-c2b5-4736-876a-e0abaddc1684,data_gov,CDC WONDER: Cancer Statistics,True,,142,105,6,False,0.588,True
+a725dbdf-f804-4120-884f-af16b67028f3,data_gov,National Death Index,True,,214,103,4,True,0.5,True
+9e9ce3da-64a6-431a-b1ec-a4ba001a2c53,data_gov,Emergency Department Volume and Capacity,True,,71,110,5,True,0.682,True
+VA-VHA-PBM-006,data_gov,VA National Formulary,True,,93,87,3,True,0.561,True
+qq3t-y24y,nyc_open_data,Local Law 14 Health Data (Middle School),True,,34,106,4,True,0.803,True
+msnn-ey3g,nyc_open_data,Local Law 14 Health Data (High School),True,,34,105,4,True,0.811,True
+fpci-ws56,nyc_open_data,Violent and Disruptive Incidents,True,,10,93,4,True,0.865,True
+c5iv-bn4s,nyc_open_data,Pickups and Drop-offs by Taxi Zone and Industry,True,,75,105,4,True,0.605,True
+8meu-9t5y,nyc_open_data,NYC Taxi Zones,True,,115,167,6,False,0.72,True
+qhkz-4dqm,nyc_open_data,Citywide Mobility Survey - Vehicle 2024,True,,112,110,4,True,0.695,True
+wgnh-qwsg,nyc_open_data,Citywide Mobility Survey - Trip 2024,True,,144,111,5,True,0.61,True
+naav-ygga,nyc_open_data,Citywide Mobility Survey - Day 2024,True,,144,97,4,True,0.554,True
+5mb3-padx,nyc_open_data,Citywide Mobility Survey - Household 2024,True,,135,116,4,True,0.64,True
+i2im-iqtt,nyc_open_data,Citywide Mobility Survey - Person 2024,True,,134,106,5,True,0.642,True
+https://doi.org/10.23719/1531143,data_gov,Supply Chain Greenhouse Gas Emission Factors v1.3 by NAICS-6,True,,172,106,6,False,0.488,True
+USDA-ERS-00071,data_gov,Fruit and Vegetable Prices,True,,21,72,3,True,0.825,False
+328ebced-5728-44b7-916f-d4fa876a1bc6,data_gov,2015-16 Advanced Placement Civil Rights Data Collection,True,,46,107,4,True,0.725,True
+5564f622-17a2-4423-a9bf-8e3fbd2a285a,data_gov,2017-18 Student Enrollment Civil Rights Data Collection,True,,49,91,5,True,0.743,True
+https://www.arcgis.com/home/item.html?id=aeb0328cb1d6412b9f7a1fc65b056148&sublayer=0,data_gov,Police Transparency - Arrests - All Data (main table / denormalized),True,,396,116,4,True,0.368,True
+CCDB,data_gov,Consumer Complaint Database,True,,74,89,4,True,0.515,True
+https://data.cdc.gov/api/views/yni7-er2q,data_gov,Mental Health Care in the Last 4 Weeks,True,,170,109,6,False,0.684,True
+4ac6fe16-957d-4e2b-bbcb-1680c9f6939c,data_gov,Civil Rights Data Collection (CRDC),True,,216,131,6,False,0.495,True
+https://data.ny.gov/api/views/uv5h-dfhp,data_gov,MTA Bus Fare Evasion: Beginning 2019,True,,52,104,8,False,0.646,True
+286204af-4841-4d1b-bd38-06ef167becfc,data_gov,Civil Rights Data Collection (CRDC) for the 2015-16  school year,True,,122,92,6,False,0.557,True
+cfuy-6eha,nyc_open_data,Average Class Size 2017-2019 (Preliminary),True,,33,119,6,False,0.835,True
+eph5-4i28,nyc_open_data,Carshare Locations - Curbside (Map),True,,47,88,4,True,0.706,True
+a2gn-nyzs,nyc_open_data,School Discharge Reporting (Local Law 42),True,,74,115,5,True,0.616,True
+qn3b-9few,nyc_open_data,DEP Green Infrastructure (Medians),True,,100,113,4,True,0.562,True
+drep-uzs7,nyc_open_data,DEP Green Infrastructure (Medians),True,,100,108,4,True,0.593,True
+fm4z-qud6,nyc_open_data,DEP Green Infrastructure (Regulated Projects),True,,121,113,4,True,0.607,True
+n7f2-dyvt,nyc_open_data,DEP Green Infrastructure (Porous Pavement Right of Way Practices),True,,148,105,4,True,0.622,True
+dwrg-kzni,nyc_open_data,DHS Daily Report (Historical),True,,43,98,4,True,0.759,True
+kwss-yksz,nyc_open_data,Archived DCWP Inspections,True,,104,109,4,True,0.6,True
+wyj6-frpa,nyc_open_data,Archived DCWP Charges,True,,44,106,4,True,0.769,True
+547,data_gov,Uniform Crime Reporting (UCR) Program,True,,21,102,6,False,0.859,True
+65519d17-b971-47da-ac4d-d7047087d82e,data_gov,2017-18 Arrests Civil Rights Data Collection,True,,38,102,8,False,0.756,True
+https://www.sec.gov/node/89641,data_gov,Summary Metrics by Decile and Quartile,True,,27,80,3,True,0.825,True
+USDA-NASS-00003,data_gov,Quick Stats Agricultural Database API,True,,78,103,8,False,0.625,True
+47fd0b8c-191e-4395-8cd1-823c18ce8689,data_gov,National Database for Autism Research (NDAR),True,,74,110,4,True,0.647,True
+https://data.wa.gov/api/views/f6w7-q2d2,data_gov,Electric Vehicle Population Data,True,,25,112,4,True,0.759,True
+https://data.cdc.gov/api/views/hn4x-zwk7,data_gov,"Nutrition, Physical Activity, and Obesity - Behavioral Risk Factor Surveillance System",True,,43,115,7,False,0.727,True
+https://hts.usitc.gov/download?release=2024HTSBasic&releaseDate=12%2F11%2F2023,data_gov,Harmonized Tariff Schedule of the United States (2024),True,,56,100,8,False,0.627,True
+dd80845b-924e-40d3-964c-dd4875113f0a,data_gov,Civil Rights Data Collection (CRDC) for the 2017-18 school year,True,,122,97,6,False,0.566,True
+015-USMint-0005,data_gov,United States Mint Annual Reports,True,,6,91,4,True,0.941,True
+w65z-zif5,nyc_open_data,New York City Deferred Compensation Plan  - Summary of Administrative Revenues and Expenses,True,,101,109,4,True,0.693,True
+2td3-mfek,nyc_open_data,Number of Participants in NYC Aging funded Programs,True,,45,121,6,False,0.737,True
+9vpn-rpgs,nyc_open_data,DCWP Licensed Vehicles,True,,26,103,4,True,0.759,True
+7arw-dbem,nyc_open_data,Lobbyists' Fundraising and Political Consulting Reports,True,,120,107,4,True,0.6,True
+rrtd-iyd7,nyc_open_data,485-x Affordable Neighborhoods for New Yorkers: Registrations of Prospective Applicants for Tax Benefits,True,,123,106,4,True,0.625,True
+9cgq-8a58,nyc_open_data,Building Auditing Report,True,,25,110,6,False,0.817,True
+fzy4-e84j,nyc_open_data,Older Adult Center (OAC) Activities,True,,52,102,4,True,0.726,True
+fpbk-q97p,nyc_open_data,FRESH Food Stores Zoning Boundaries (Map),True,,23,91,4,True,0.775,True
+im9z-53hg,nyc_open_data,Housing Maintenance Code Violations NYCHA properties,True,,37,109,4,True,0.714,True
+hi2h-7vr7,nyc_open_data,Local Law 14 Health Data (HlV/AIDS Lessons),True,,34,107,4,True,0.848,True
+US-GOV-SSA-339,data_gov,Baby Names from Social Security Card Applications - State and District of Columbia Data,True,,30,101,6,False,0.741,True
+e212e397-1277-4df3-8c22-40721b095f33,data_gov,CA Geographic Boundaries,True,,40,95,4,True,0.716,True
+d9f79af3-1c18-4210-ab75-66241ab75fc2,data_gov,2017-18 Mathematics and Science Civil Rights Data Collection,True,,46,95,5,True,0.729,True
+NCSES-FAC2019,data_gov,Survey of Science and Engineering Research Facilities 2019,True,,89,110,6,False,0.605,True
+https://datainventory.usbr.gov/rise/item/4822,data_gov,Fruitgrowers Reservoir and Dam Daily Reservoir Release - Total-cfs Time Series Data,True,,21,76,3,True,0.746,True
+c1816abc-d633-4fbd-aa48-b8998f9e9f66,data_gov,2017-18 Harassment or Bullying Civil Rights Data Collection,True,,44,90,5,True,0.693,True
+da836467b4904711b14d74acbc4568be,data_gov,Residential Construction Permits by County,True,,75,87,6,False,0.535,True
+https://data.transportation.gov/api/views/7n6a-n5tz,data_gov,Auto Sales,True,,32,63,5,True,0.655,True
+USDA-ERS-26001,data_gov,Food Price Outlook,True,,70,94,4,True,0.671,True
+https://data.cdc.gov/api/views/hfr9-rurv,data_gov,Alzheimer's Disease and Healthy Aging Data,True,,8,97,7,False,0.935,True
+53n2-m85m,nyc_open_data,Borough Boundaries (water areas included),True,,18,83,4,True,0.821,True
+h3ce-uahi,nyc_open_data,DEP Green Infrastructure Map (All Layers),True,,88,103,4,True,0.564,True
+df32-vzax,nyc_open_data,DEP Green Infrastructure (Point Layer),True,,110,107,4,True,0.619,True
+eqxx-j5y8,nyc_open_data,VZV Speed Humps,True,,34,95,4,True,0.743,True
+jknp-skuy,nyc_open_data,VZV Speed Humps,True,,34,99,4,True,0.789,True
+kizp-4dfk,nyc_open_data,311 Customer Satisfaction Survey,True,,111,113,5,True,0.602,True
+2c5m-rke8,nyc_open_data,NYCDEP Citywide Catch Basins,True,,53,92,4,True,0.699,True
+2w2g-fk3i,nyc_open_data,NYCDEP Citywide Catch Basins,True,,53,109,4,True,0.745,True
+2juy-aj8e,nyc_open_data,Queens Air Quality Sensor Pilot (February - November 2024),True,,127,118,5,True,0.626,True
+yqww-f9f3,nyc_open_data,Borough Boundaries,True,,18,83,4,True,0.823,True
+USDA-ERS-00074,data_gov,International Food Security,True,,83,100,4,True,0.577,True
+MGMT-GMO-HIFLD-847169,data_gov,Electric Power Transmission Lines,True,,15,82,4,True,0.812,True
+PL2018,data_gov,Public Library Survey (PLS) 2018,True,,27,108,5,True,0.896,True
+https://data.cityofchicago.org/api/views/t2rn-p8d7,data_gov,CTA - Ridership - 'L' Station Entries - Monthly Day-Type Averages & Totals,True,,66,92,4,True,0.636,True
+https://data.cityofnewyork.us/api/views/f888-ni5f,data_gov,Primary Land Use Tax Lot Output - Map (MapPLUTO),True,,62,95,4,True,0.521,True
+MSHA-19-012:030-162,data_gov,Mine Injury and Worktime Quarterly Reports,True,,48,109,4,True,0.718,True
+https://www.sec.gov/node/89631,data_gov,Summary Metrics by Exchange,True,,10,67,3,True,0.878,True
+MSHA-19-012:030-159,data_gov,MSHA Coal Employment & Fatality Statistics,True,,13,101,6,False,0.903,True
+https://data.ny.gov/api/views/d6yy-54nr,data_gov,Lottery Powerball Winning Numbers: Beginning 2010,True,,15,82,4,True,0.85,True
+DOE-019-540445745,data_gov,International Energy Data Application Programming Interface (API),True,,43,93,4,True,0.617,True
+wh8n-imgd,nyc_open_data,Local Law 3 of 2022 - Supportive Housing - Reporting on Coordinated Assessment and Placement System,True,,192,115,6,False,0.538,True
+ct66-47at,nyc_open_data,Bicycle and Pedestrian Counts,True,,86,101,4,True,0.643,True
+6up2-gnw8,nyc_open_data,Bicycle and Pedestrian Count Sensors,True,,25,122,4,True,0.844,True
+76ig-c548,nyc_open_data,311 Service Requests from 2010 to 2019,True,,95,116,6,False,0.685,True
+rixx-fc37,nyc_open_data,Historical Voter Turnout,True,,24,103,8,False,0.815,True
+gdk4-mbsv,nyc_open_data,Shooting Offenders (2006-Present),True,,43,112,4,True,0.778,True
+pztn-9bne,nyc_open_data,Shooting Victims (2006-Present),True,,42,94,4,True,0.703,True
+5ucz-vwe8,nyc_open_data,Shootings (2006-Present),True,,42,96,4,True,0.723,True
+m5vz-tzqv,nyc_open_data,Parking Violations Issued - Fiscal Year 2025,True,,153,98,5,True,0.697,True
+8zf9-spf8,nyc_open_data,Parking Violations Issued - Fiscal Year 2024,True,,153,102,4,True,0.654,True
+https://data.nasa.gov/api/views/gh4g-9sfh,data_gov,Meteorite Landings,True,,100,95,6,False,0.692,True
+https://datadiscovery.nlm.nih.gov/api/views/vp23-ayt5,data_gov,MedPix,True,,36,87,4,True,0.746,True
+https://data.cdc.gov/api/views/8pt5-q6wp,data_gov,Indicators of Anxiety or Depression Based on Reported Frequency of Symptoms During Last 7 Days,True,,170,125,8,False,0.742,True
+https://datafiles.samhsa.gov/study/national-survey-drug-use-and-health-nsduh-2015-nid16893,data_gov,National Survey on Drug Use and Health (NSDUH-2015),True,,401,99,6,False,0.342,True
+NCSES-SED2022,data_gov,Survey of Earned Doctorates 2022,True,,109,116,6,False,0.602,True
+https://data.cdc.gov/api/views/w9j2-ggv5,data_gov,NCHS - Death rates and life expectancy at birth,True,,305,96,8,False,0.514,True
+USDA-ERS-26131,data_gov,Food Access Research Atlas,True,,51,81,3,True,0.701,True
+DOL-BLS-150,data_gov,Occupational Employment and Wage Statistics (OES),True,,142,89,4,True,0.581,True
+https://data.kingcounty.gov/api/views/ngy6-yfbq,data_gov,CDC Social Vulnerability Index (CDCSVI),True,,142,103,4,True,0.523,True
+PL2022,data_gov,Public Library Survey (PLS) 2022,True,,32,96,4,True,0.757,True
+nibs-na6y,nyc_open_data,Advertised Lotteries on Housing Connect By Building,True,,203,121,4,True,0.567,True
+48wd-x25j,nyc_open_data,Multiple Removals 2015-2018,True,,22,100,4,True,0.824,True
+ezy6-djsf,nyc_open_data,Street Closures due to Construction Activities by Block and Intersection,True,,81,103,4,True,0.696,True
+irna-apch,nyc_open_data,2024 Survey of Volunteerism,True,,94,111,4,True,0.698,True
+mg8s-7r2b,nyc_open_data,Attendance Results 2013-2019,True,,14,91,4,True,0.806,True
+i642-2fxq,nyc_open_data,Sidewalk Management Database - Lot Info,True,,38,89,3,True,0.743,True
+n5c8-x7x2,nyc_open_data,Weigh in Motion (Historical),True,,90,105,4,True,0.607,True
+iwat-y983,nyc_open_data,Report to City Council on Preplacement,True,,13,97,4,True,0.859,True
+3mf9-qshr,nyc_open_data,Centerline,True,,28,92,4,True,0.677,True
+inkn-q76z,nyc_open_data,Centerline,True,,28,100,4,True,0.769,True
+https://data.transportation.gov/api/views/6axg-epim,data_gov,Recalls Data,True,,180,123,5,True,0.593,True
+https://data.cityofchicago.org/api/views/ijzp-q8t2,data_gov,Crimes - 2001 to Present,True,,367,97,4,True,0.5,True
+DOE-019-5416563059,data_gov,Monthly and Annual Energy Consumption by Sector,True,,28,75,5,True,0.742,True
+c37c5f79-a2cc-40e4-a69d-45dbceb773e3,data_gov,CDC WONDER: Detailed Mortality - Underlying Cause of Death,True,,140,88,8,False,0.523,True
+a6312d29-ef5b-4df4-97ea-5da38ce36a7f,data_gov,2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection,True,,85,105,4,True,0.611,True
+015-DO-020,data_gov,Interest Rate Statistics - Daily Treasury Yield Curve Rates,True,,126,101,6,False,0.526,True
+http://datainventory.doi.gov/id/dataset/FWS_ServCat_117348,data_gov,Water Quality Data,True,,42,87,4,True,0.667,True
+https://data.kingcounty.gov/api/views/4uz2-aqdz,data_gov,Voter Registration by Census Tract,True,,499,104,4,True,0.471,True
+https://data.cityofnewyork.us/api/views/4b4i-vvec,data_gov,2023 Yellow Taxi Trip Data,True,,55,98,4,True,0.741,True
+USDA-NASS-00001,data_gov,Quick Stats Agricultural Database,True,,76,117,8,False,0.644,True
+95zn-7w5f,nyc_open_data,NYC Climate Budgeting Report: Resiliency Exposure Forecast - Outdoor Heat,True,,233,105,4,True,0.451,True
+dpq6-sy7w,nyc_open_data,NYC Climate Budgeting Report: Resiliency Exposure Inventory,True,,205,117,4,True,0.593,True
+7n9x-tbtd,nyc_open_data,NYC Climate Budgeting Report: Resiliency Exposure Forecast - Coastal Flooding,True,,232,99,4,True,0.589,True
+fpeh-f7ci,nyc_open_data,Dining Out NYC Locations,True,,37,95,4,True,0.757,True
+5ijn-vbdv,nyc_open_data,311 Resolution Satisfaction Survey,True,,111,114,4,True,0.718,True
+kbgp-72qi,nyc_open_data,NYC Planimetric Database: Cooling Towers,True,,36,84,4,True,0.723,True
+x748-37q7,nyc_open_data,NYC Planimetric Database: Cooling Towers,True,,36,93,6,False,0.835,True
+2t89-756w,nyc_open_data,Suspension Report NYPD Contacts (2015-2018),True,,24,101,6,False,0.81,True
+npwk-bcm6,nyc_open_data,Class Size Report (2006-2007),True,,461,106,4,True,0.519,True
+vy5i-a666,nyc_open_data,Advertised Lotteries on Housing Connect by Lottery,True,,203,105,6,False,0.564,True
+75,data_gov,Arrest Data,True,,31,106,4,True,0.759,True
+92615-00000-6,data_gov,Bank Failures and Assistance Data,True,,28,99,6,False,0.79,True
+https://www.arcgis.com/home/item.html?id=74d924ddc3374e3b977e6f002478cb9b&sublayer=7,data_gov,Crime Incidents in 2025,True,,160,116,6,False,0.549,True
+FEMA-0372,data_gov,Hazard Mitigation Assistance Projects,True,,366,106,4,True,0.464,True
+https://data.openei.org/submissions/6458,data_gov,Event-correlated Outage Dataset in America,True,,201,100,4,True,0.513,True
+https://www.bea.gov/data/prices-inflation/regional-price-parities-state-and-metro-area,data_gov,Regional Price Parities by State and Metro Area,True,,40,84,6,False,0.714,True
+GSA-4495,data_gov,Inventory of Owned and Leased Properties (IOLP),True,,233,110,8,False,0.483,True
+https://data.cityofchicago.org/api/views/85ca-t3if,data_gov,Traffic Crashes - Crashes,True,,380,112,4,True,0.489,True
+https://doi.org/10.23719/1528686,data_gov,Supply Chain Greenhouse Gas Emission Factors v1.2 by NAICS-6,True,,178,97,6,False,0.351,True
+DOE-019-8600473829,data_gov,International Energy Statistics,True,,39,96,4,True,0.782,True
+kj7g-u4gp,nyc_open_data,Electric Vehicle (EV) Charging Data - Municipal Lots and Garages,True,,89,99,4,True,0.636,True
+7qsb-ehm7,nyc_open_data,Natural Turf Site List,True,,48,102,4,True,0.756,True
+xsf7-3x9j,nyc_open_data,Digital Tax Map: Real Estate of Utility Company (REUC) Lots,True,,244,106,4,True,0.488,True
+eguu-7ie3,nyc_open_data,Digital Tax Map: Condominium Units,True,,241,115,4,True,0.526,True
+mdja-si6a,nyc_open_data,Digital Tax Map: Air Lots,True,,242,109,4,True,0.507,True
+9ksk-35jf,nyc_open_data,Class Size Report Distribution Summary (2010-2015),True,,13,118,4,True,0.879,True
+nbpb-zygj,nyc_open_data,Class Size Report Detail Summary (2010-2015),True,,14,122,4,True,0.854,True
+x7wt-jhdr,nyc_open_data,Building Footprints Historic (Map),True,,55,104,4,True,0.685,True
+jh45-qr5r,nyc_open_data,Building Footprints (Map),True,,53,79,4,True,0.75,True
+inb9-u6nt,nyc_open_data,LockerNYC Reservations,True,,61,84,6,False,0.662,True
+USDA NAIP Collection Starting 2003,data_gov,National Agriculture Imagery Program (NAIP) Imagery,True,,218,104,4,True,0.588,True
+https://data.cityofchicago.org/api/views/bynn-gwxy,data_gov,CTA - Ridership - Bus Routes - Monthly Day-Type Averages & Totals,True,,35,87,4,True,0.795,True
+5f7b954d-5a60-45d7-959a-b1a0a0e66058,data_gov,2017-18 Discipline Civil Rights Data Collection,True,,81,97,6,False,0.767,True
+74b655ae-6158-41ab-81ef-a02984a17cc1,data_gov,"Local Area Unemployment Statistics (LAUS), Annual Average",True,,167,112,4,True,0.536,True
+https://www.arcgis.com/home/item.html?id=20df56ef4d5b44bcae4ac4dca118442e&sublayer=1,data_gov,ArchaeologyGrid,True,,127,116,8,False,0.704,False
+f22c9b6a-e68a-445a-ae44-1441b2f698ab,data_gov,Drugs@FDA Database,True,,46,83,5,True,0.645,True
+https://data.transportation.gov/api/views/56fa-sf82,data_gov,U.S. Marketing Air Carriers On-time Performance,True,,96,102,8,False,0.565,True
+https://data.cdc.gov/api/views/mpx5-t7tu,data_gov,"Provisional COVID-19 death counts, rates, and percent of total deaths, by jurisdiction of residence",True,,512,106,6,False,0.464,True
+https://data.wa.gov/api/views/4wur-kfnr,data_gov,Business Lookup,True,,70,92,4,True,0.63,True
+https://data.montgomerycountymd.gov/api/views/v76h-r7br,data_gov,Warehouse and Retail Sales,True,,20,100,4,True,0.871,True
+ek8y-fsqz,nyc_open_data,Sea Level Rise Maps (2080s 100-year Floodplain),False,rate_limit,138,0,0,False,0.0,False
+wcrd-6u4m,nyc_open_data,NYC Open Data Plan: Mayor's Management Report (MMR) Indicators,True,,51,108,4,True,0.789,True
+t3jq-9nkf,nyc_open_data,NYC Agencies and Governance Organizations,True,,52,91,4,True,0.75,True
+r773-ytwa,nyc_open_data,2013-2015 School Closure Discharge Reporting,True,,22,114,4,True,0.859,True
+abh8-frsx,nyc_open_data,2015-2018 School Closure Discharge Reporting,True,,22,102,4,True,0.835,True
+hzd8-k2vv,nyc_open_data,Business Improvement District (BID) Trends Report (FY24),True,,0,119,5,True,1.0,True
+5nux-zfmw,nyc_open_data,Local Law 97 of 2021 - Pets in Shelter Report,True,,60,121,4,True,0.821,True
+9pim-syj6,nyc_open_data,Sea Level Rise Maps (2100 100-year Floodplain),True,,68,83,3,True,0.569,True
+rf9r-c4pz,nyc_open_data,Sea Level Rise Maps (2100 100-year Floodplain),False,rate_limit,68,0,0,False,0.0,False
+6jtr-t483,nyc_open_data,Sea Level Rise Maps (2080s 100-year Floodplain),True,,138,99,4,True,0.583,True
+https://data.lacity.org/api/views/2nrs-mtv8,data_gov,Crime Data from 2020 to 2024,True,,301,126,6,False,0.604,True
+FEMA-0397,data_gov,FIMA NFIP Redacted Claims (OpenFEMA),True,,467,93,4,True,0.549,True
+US-GOV-SSA-338,data_gov,Baby Names from Social Security Card Applications - National Data,True,,23,92,6,False,0.789,True
+https://data.cdc.gov/api/views/hksd-2xuw,data_gov,U.S. Chronic Disease Indicators,True,,80,98,6,False,0.753,True
+NASA-904,data_gov,JPL Small Body Database Browser,True,,48,74,4,True,0.719,True
+https://api.census.gov/data/id/ACSPUMS1Y2019,data_gov,ACS 1-Year PUMS,True,,167,103,8,False,0.543,True
+https://data.cityofnewyork.us/api/views/uip8-fykc,data_gov,NYPD Arrest Data (Year to Date),True,,98,122,4,True,0.745,True
+28a39c03-7fe6-4621-8ca5-6b5c0eb58bd5,data_gov,2017-18 Advanced Placement Courses Civil Rights Data Collection,True,,57,107,6,False,0.699,True
+08d3f21c-6ab7-4f78-9590-54eb07ee6670,data_gov,Mental Health Treatement Facilities Locator,True,,266,100,4,True,0.521,True
+https://data.cityofnewyork.us/api/views/25th-nujf,data_gov,Popular Baby Names,True,,67,91,4,True,0.649,True
