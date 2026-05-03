@@ -135,22 +135,41 @@ pip install -r requirements.txt
 pip install rouge-score bert-score nltk
 ```
 
+### Upload scripts to the cluster
+
+Before running any stage, copy the scripts from your local machine to the DataProc master node:
+
+```bash
+# From your local machine — copy the scripts folder to the master node
+gcloud compute scp --recurse scripts/ <master-node>:~/scripts/ --zone=<zone>
+
+# Or copy individual files
+gcloud compute scp scripts/dataproc_ingest_and_sample_v2.py <master-node>:~/scripts/ --zone=<zone>
+gcloud compute scp scripts/dataproc_profile_combined.py     <master-node>:~/scripts/ --zone=<zone>
+gcloud compute scp scripts/dataproc_generate_descriptions.py <master-node>:~/scripts/ --zone=<zone>
+```
+
+Then SSH into the master node to run each stage:
+
+```bash
+gcloud compute ssh <master-node> --zone=<zone>
+```
+
 ### Stage 1 — Ingestion & Sampling (DataProc)
 
 ```bash
-gcloud dataproc jobs submit pyspark scripts/dataproc_ingest_and_sample_v2.py \
-  --cluster=<your-cluster> \
-  --region=<region>
+# Run from inside the master node
+spark-submit ~/scripts/dataproc_ingest_and_sample_v2.py
 ```
 
 Fetches 100 NYC + 100 Data.gov datasets in parallel across 40 Spark partitions. Uses the Socrata JSON API for NYC sample rows and streams CSVs for Data.gov to avoid downloading full files.
 
+Output is written to HDFS automatically — no manual HDFS copy needed.
+
 ### Stage 2 — Profiling (DataProc)
 
 ```bash
-gcloud dataproc jobs submit pyspark scripts/dataproc_profile_combined.py \
-  --cluster=<your-cluster> \
-  --region=<region>
+spark-submit ~/scripts/dataproc_profile_combined.py
 ```
 
 Reads the metadata parquet from HDFS, applies Spark UDFs to compute per-column statistics (type inference, missing counts, example values).
@@ -158,13 +177,23 @@ Reads the metadata parquet from HDFS, applies Spark UDFs to compute per-column s
 ### Stage 3 — LLM Generation (DataProc)
 
 ```bash
-gcloud dataproc jobs submit pyspark scripts/dataproc_generate_descriptions.py \
-  --cluster=<your-cluster> \
-  --region=<region> \
-  --properties=spark.executorEnv.ANTHROPIC_API_KEY=<your-key>
+# Set your Anthropic API key first
+export ANTHROPIC_API_KEY=<your-key>
+
+spark-submit ~/scripts/dataproc_generate_descriptions.py
 ```
 
 Calls `claude-sonnet-4-5` via the Anthropic API using `mapPartitions` across 10 partitions. Builds one structured prompt per dataset from title, description, keywords, column profiles, and a sample row.
+
+### Download output from HDFS (after Stage 3)
+
+```bash
+# On the master node — copy parquet output from HDFS to local filesystem
+hdfs dfs -get /user/km6579_nyu_edu/data/descriptions/generated_descriptions_sonnet.parquet ~/
+
+# Then from your local machine — copy from master node to local
+gcloud compute scp --recurse <master-node>:~/generated_descriptions_sonnet.parquet ./data/descriptions/ --zone=<zone>
+```
 
 ### Stage 4 — Evaluation (local)
 
