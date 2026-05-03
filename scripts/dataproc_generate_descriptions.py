@@ -1,8 +1,8 @@
 import json
 import os
+import sys
 import time
 
-import anthropic
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf, col
 from pyspark.sql.types import StringType
@@ -56,6 +56,9 @@ Description:"""
 
 
 def generate_description_for_partition(rows, api_key):
+    sys.path.insert(0, "anthropic_pkg")
+    import anthropic
+
     client = anthropic.Anthropic(api_key=api_key)
     out = []
 
