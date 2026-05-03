@@ -14,3 +14,12 @@ data/final_dataset_description_results.parquet
 
 !data/metadata/
 !data/metadata/combined_metadata_with_samples.parquet
+
+# Word lock files
+data/~$*.docx
+
+# Notebook outputs
+data/notebook_output/
+
+# macOS
+.DS_Store
