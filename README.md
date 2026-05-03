@@ -7,7 +7,7 @@
 - Dataset type:
   - Tabular datasets only
 - Initial scale:
-  - 20 to 50 datasets total
+  - 200 datasets total (100 NYC + 100 Data.gov)
 - Compute:
   - PySpark on NYU DataProc
 - Storage:
