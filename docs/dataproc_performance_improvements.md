@@ -67,6 +67,27 @@ The original 90-second timeout meant a single unresponsive dataset URL could sta
 
 ---
 
+---
+
+### 5. Explicit schema for `createDataFrame` (Bug Fix in v2)
+
+**What we changed:**
+Added an explicit `StructType` schema when calling `spark.createDataFrame(enriched_rdd, schema=schema)` instead of relying on Spark's schema inference.
+
+**Why:**
+When `process_partition` catches an exception mid-processing, it returns an error record where most fields are `None`. If Spark samples these rows during schema inference, it sees all `None`s for a field and cannot determine whether it's a string, int, or any other type — throwing:
+```
+PySparkValueError: [CANNOT_DETERMINE_TYPE] Some of types cannot be determined after inferring.
+```
+This caused the job to fail after all the data had already been fetched.
+
+**Impact:**
+- Fixes a crash that would occur at the `createDataFrame` step
+- No change in data — all fields are already strings or None
+- Both the original script and v2 had this bug; v2 is the fixed version
+
+---
+
 ## Summary
 
 | Change | Data Impact | Speed Impact |
@@ -75,5 +96,6 @@ The original 90-second timeout meant a single unresponsive dataset URL could sta
 | NYC JSON API | None | High |
 | More partitions | None | Medium |
 | Lower timeout | None | Medium |
+| Explicit schema | None (bug fix) | None |
 
-All changes are purely performance optimizations. The output parquet file contains the same 200 datasets with the same sample rows.
+The v2 script includes all performance optimizations and the schema inference bug fix.

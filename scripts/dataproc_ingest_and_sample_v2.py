@@ -5,6 +5,7 @@ from io import StringIO
 
 import pandas as pd
 from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType
 
 
 NYC_CATALOG_URL = "https://data.cityofnewyork.us/api/views.json"
@@ -285,7 +286,25 @@ def main():
     rdd = sc.parallelize(combined_index, partitions)
     enriched_rdd = rdd.mapPartitions(process_partition)
 
-    df = spark.createDataFrame(enriched_rdd)
+    schema = StructType([
+        StructField("dataset_id", StringType(), True),
+        StructField("source", StringType(), True),
+        StructField("title", StringType(), True),
+        StructField("original_description", StringType(), True),
+        StructField("keywords_json", StringType(), True),
+        StructField("column_names_json", StringType(), True),
+        StructField("column_types_raw_json", StringType(), True),
+        StructField("download_url", StringType(), True),
+        StructField("landing_page_url", StringType(), True),
+        StructField("record_count_estimate", StringType(), True),
+        StructField("last_updated", StringType(), True),
+        StructField("license", StringType(), True),
+        StructField("sample_rows_json", StringType(), True),
+        StructField("sample_error", StringType(), True),
+        StructField("raw_metadata_json", StringType(), True),
+    ])
+
+    df = spark.createDataFrame(enriched_rdd, schema=schema)
 
     output_path = "hdfs:///user/km6579_nyu_edu/data/metadata/combined_metadata_with_samples_v2.parquet"
     df.write.mode("overwrite").parquet(output_path)
