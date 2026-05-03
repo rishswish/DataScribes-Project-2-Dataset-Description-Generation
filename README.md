@@ -172,7 +172,7 @@ Then open `http://localhost:8888` and run `notebooks/autoddg_pipeline_hpc.ipynb`
 - **Instructor**: Professor Juliana Freire
 - **Section Leader**: Dr. Christos Koutras
 - **Team**: DataScribes
-- **Members**: Rishabh Patil (rbp5812)
+- **Members**: Rishabh Patil (rbp5812), Kund Meghani (km6579), Aditya Taware (at6370)
 
 ---
 
