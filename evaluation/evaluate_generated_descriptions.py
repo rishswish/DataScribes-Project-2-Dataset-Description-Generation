@@ -4,7 +4,7 @@ import math
 import re
 from collections import Counter
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import pandas as pd
 
@@ -16,6 +16,22 @@ STOPWORDS = {
     "used", "use", "can", "may", "will", "data", "dataset", "datasets",
     "new", "york", "city", "nyc", "gov", "open", "public",
 }
+
+
+def safe_import_meteor():
+    try:
+        from nltk.translate.meteor_score import meteor_score
+        return meteor_score, None
+    except Exception as exc:
+        return None, str(exc)
+
+
+def safe_import_bertscore():
+    try:
+        from bert_score import score
+        return score, None
+    except Exception as exc:
+        return None, str(exc)
 
 
 def clean_text(value: object) -> str:
@@ -87,6 +103,46 @@ def compression_ratio(reference: str, candidate: str) -> float:
     if ref_len == 0:
         return 0.0
     return len(candidate) / ref_len
+
+
+def meteor_score_value(
+    reference: str,
+    candidate: str,
+    meteor_func,
+) -> Optional[float]:
+    if meteor_func is None:
+        return None
+    ref_tokens = tokenize(reference)
+    cand_tokens = tokenize(candidate)
+    if not ref_tokens or not cand_tokens:
+        return 0.0
+    try:
+        return float(meteor_func([ref_tokens], cand_tokens))
+    except Exception:
+        return None
+
+
+def compute_bertscore_values(
+    references: List[str],
+    candidates: List[str],
+    bertscore_func,
+) -> List[Optional[float]]:
+    if bertscore_func is None:
+        return [None] * len(references)
+    if not references:
+        return []
+
+    try:
+        _, _, f1 = bertscore_func(
+            candidates,
+            references,
+            lang="en",
+            verbose=False,
+            rescale_with_baseline=True,
+        )
+        return [float(value) for value in f1.tolist()]
+    except Exception:
+        return [None] * len(references)
 
 
 def extract_salient_terms(text: str, limit: int) -> List[str]:
@@ -203,6 +259,9 @@ def error_bucket(error_text: str) -> str:
 
 def compute_row_metrics(df: pd.DataFrame) -> pd.DataFrame:
     result = df.copy()
+    meteor_func, meteor_import_error = safe_import_meteor()
+    bertscore_func, bertscore_import_error = safe_import_bertscore()
+
     result["original_description"] = result["original_description"].apply(clean_text)
     result["generated_description"] = result["generated_description"].apply(clean_text)
     result["generation_error"] = result["generation_error"].apply(clean_text)
@@ -229,10 +288,30 @@ def compute_row_metrics(df: pd.DataFrame) -> pd.DataFrame:
         lambda row: rouge_l_f1(row["original_description"], row["generated_description"]),
         axis=1,
     )
+    result["meteor"] = result.apply(
+        lambda row: meteor_score_value(
+            row["original_description"],
+            row["generated_description"],
+            meteor_func,
+        ),
+        axis=1,
+    )
     result["pseudo_query"] = result.apply(
         lambda row: build_query(row["title"], row["original_description"]),
         axis=1,
     )
+    successful = result["has_generated_description"]
+    bertscore_values = compute_bertscore_values(
+        result.loc[successful, "original_description"].tolist(),
+        result.loc[successful, "generated_description"].tolist(),
+        bertscore_func,
+    )
+    result["bertscore_f1"] = None
+    result.loc[successful, "bertscore_f1"] = bertscore_values
+    result.attrs["meteor_available"] = meteor_func is not None
+    result.attrs["meteor_import_error"] = meteor_import_error
+    result.attrs["bertscore_available"] = bertscore_func is not None
+    result.attrs["bertscore_import_error"] = bertscore_import_error
     return result
 
 
@@ -249,6 +328,8 @@ def summarize_subset(df: pd.DataFrame, label: str) -> Dict[str, float]:
         "avg_rouge1_f1": float(successful["rouge1_f1"].mean()) if len(successful) else 0.0,
         "avg_rouge2_f1": float(successful["rouge2_f1"].mean()) if len(successful) else 0.0,
         "avg_rougeL_f1": float(successful["rougeL_f1"].mean()) if len(successful) else 0.0,
+        "avg_meteor": float(successful["meteor"].dropna().mean()) if len(successful["meteor"].dropna()) else float("nan"),
+        "avg_bertscore_f1": float(successful["bertscore_f1"].dropna().mean()) if len(successful["bertscore_f1"].dropna()) else float("nan"),
     }
 
 
@@ -257,20 +338,37 @@ def write_markdown_report(
     summaries: pd.DataFrame,
     retrieval_df: pd.DataFrame,
     error_df: pd.DataFrame,
+    metric_availability: Dict[str, object],
 ) -> None:
     overall = summaries[summaries["segment"] == "overall"].iloc[0]
     overall_retrieval = retrieval_df[retrieval_df["segment"] == "overall"].set_index("corpus")
 
+    meteor_value = "unavailable"
+    if pd.notna(overall["avg_meteor"]):
+        meteor_value = f"{overall['avg_meteor']:.4f}"
+
+    bertscore_value = "unavailable"
+    if pd.notna(overall["avg_bertscore_f1"]):
+        bertscore_value = f"{overall['avg_bertscore_f1']:.4f}"
+
     lines = [
         "# Generated Description Evaluation Report",
         "",
-        "## Overview",
+        "## Reliability Metrics",
         f"- Evaluated rows: {int(overall['row_count'])}",
         f"- Generation success rate: {overall['generation_success_rate']:.2%}",
         f"- Generation error rate: {overall['generation_error_rate']:.2%}",
+        "",
+        "## Quality Metrics",
         f"- Average ROUGE-1 F1: {overall['avg_rouge1_f1']:.4f}",
         f"- Average ROUGE-2 F1: {overall['avg_rouge2_f1']:.4f}",
         f"- Average ROUGE-L F1: {overall['avg_rougeL_f1']:.4f}",
+        f"- Average METEOR: {meteor_value}",
+        f"- Average BERTScore F1: {bertscore_value}",
+        "",
+        "## Metric Availability",
+        f"- METEOR available: {metric_availability['meteor_available']}",
+        f"- BERTScore available: {metric_availability['bertscore_available']}",
         "",
         "## Retrieval Proxy",
         "Pseudo-queries are built from dataset titles plus salient terms from the original descriptions.",
@@ -279,8 +377,16 @@ def write_markdown_report(
         f"- Original description Recall@10: {overall_retrieval.loc['original_description', 'recall_at_10']:.2%}",
         f"- Generated description Recall@10: {overall_retrieval.loc['generated_description', 'recall_at_10']:.2%}",
         "",
-        "## Errors",
+        "## Reliability Error Breakdown",
     ]
+
+    if metric_availability["meteor_import_error"]:
+        lines.append(f"- METEOR import note: {metric_availability['meteor_import_error']}")
+    if metric_availability["bertscore_import_error"]:
+        lines.append(f"- BERTScore import note: {metric_availability['bertscore_import_error']}")
+    if metric_availability["meteor_import_error"] or metric_availability["bertscore_import_error"]:
+        lines.append("")
+        lines.append("## Errors")
 
     if error_df.empty:
         lines.append("- No generation errors found.")
@@ -294,17 +400,20 @@ def write_markdown_report(
         "",
         "## By Source",
         "",
-        "| Segment | Success Rate | ROUGE-1 | ROUGE-2 | ROUGE-L | Avg Generated Chars |",
-        "| --- | ---: | ---: | ---: | ---: | ---: |",
+        "| Segment | Success Rate | ROUGE-1 | ROUGE-2 | ROUGE-L | METEOR | BERTScore F1 | Avg Generated Chars |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ])
 
     for _, row in summaries.iterrows():
         if row["segment"] == "overall":
             continue
+        meteor_cell = f"{row['avg_meteor']:.4f}" if pd.notna(row["avg_meteor"]) else "unavailable"
+        bertscore_cell = f"{row['avg_bertscore_f1']:.4f}" if pd.notna(row["avg_bertscore_f1"]) else "unavailable"
         lines.append(
             f"| {row['segment']} | {row['generation_success_rate']:.2%} | "
             f"{row['avg_rouge1_f1']:.4f} | {row['avg_rouge2_f1']:.4f} | "
-            f"{row['avg_rougeL_f1']:.4f} | {row['avg_generated_char_len']:.1f} |"
+            f"{row['avg_rougeL_f1']:.4f} | {meteor_cell} | {bertscore_cell} | "
+            f"{row['avg_generated_char_len']:.1f} |"
         )
 
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -330,6 +439,12 @@ def main() -> None:
 
     df = pd.read_csv(input_path, quoting=csv.QUOTE_MINIMAL)
     metrics_df = compute_row_metrics(df)
+    metric_availability = {
+        "meteor_available": bool(metrics_df.attrs.get("meteor_available")),
+        "meteor_import_error": metrics_df.attrs.get("meteor_import_error"),
+        "bertscore_available": bool(metrics_df.attrs.get("bertscore_available")),
+        "bertscore_import_error": metrics_df.attrs.get("bertscore_import_error"),
+    }
 
     summaries = [
         summarize_subset(metrics_df, "overall"),
@@ -369,6 +484,7 @@ def main() -> None:
         summaries_df,
         retrieval_df,
         error_df,
+        metric_availability,
     )
 
     print(f"Saved row metrics to {output_dir / 'generated_description_row_metrics.csv'}")

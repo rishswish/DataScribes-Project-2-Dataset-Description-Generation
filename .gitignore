@@ -12,6 +12,7 @@ data/manual_evaluation_sample.xlsx
 data/report_summary_table.csv
 data/report_summary_table.xlsx
 data/final_dataset_description_results.parquet
+docs/progress_log.md
 
 !data/metadata/
 !data/metadata/combined_metadata_with_samples.parquet
