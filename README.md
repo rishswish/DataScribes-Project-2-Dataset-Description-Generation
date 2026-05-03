@@ -137,22 +137,12 @@ pip install rouge-score bert-score nltk
 
 ### Upload scripts to the cluster
 
-Before running any stage, copy the scripts from your local machine to the DataProc master node:
+Open the DataProc master node in SSH-in-browser (via Google Cloud Console). Use the **Upload File** button in the top-right corner to upload each script from your local machine. Once uploaded, move them into the scripts folder:
 
 ```bash
-# From your local machine — copy the scripts folder to the master node
-gcloud compute scp --recurse scripts/ <master-node>:~/scripts/ --zone=<zone>
-
-# Or copy individual files
-gcloud compute scp scripts/dataproc_ingest_and_sample_v2.py <master-node>:~/scripts/ --zone=<zone>
-gcloud compute scp scripts/dataproc_profile_combined.py     <master-node>:~/scripts/ --zone=<zone>
-gcloud compute scp scripts/dataproc_generate_descriptions.py <master-node>:~/scripts/ --zone=<zone>
-```
-
-Then SSH into the master node to run each stage:
-
-```bash
-gcloud compute ssh <master-node> --zone=<zone>
+mv dataproc_ingest_and_sample_v2.py ~/scripts/
+mv dataproc_profile_combined.py ~/scripts/
+mv dataproc_generate_descriptions.py ~/scripts/
 ```
 
 ### Stage 1 — Ingestion & Sampling (DataProc)
