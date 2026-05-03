@@ -219,7 +219,7 @@ def main():
 
     df = spark.createDataFrame(combined_records)
 
-    output_path = "hdfs:///user/rbp5812_nyu_edu/data/metadata/combined_metadata.parquet"
+    output_path = "hdfs:///user/km6579_nyu_edu/data/metadata/combined_metadata.parquet"
     df.write.mode("overwrite").parquet(output_path)
 
     df.groupBy("source").count().show(truncate=False)

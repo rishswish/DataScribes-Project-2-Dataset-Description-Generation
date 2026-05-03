@@ -9,6 +9,7 @@ from pyspark.sql import SparkSession
 
 NYC_CATALOG_URL = "https://data.cityofnewyork.us/api/views.json"
 NYC_VIEW_URL_TEMPLATE = "https://data.cityofnewyork.us/api/views/{dataset_id}.json"
+NYC_JSON_RESOURCE_TEMPLATE = "https://data.cityofnewyork.us/resource/{dataset_id}.json?$limit={limit}"
 
 DATA_GOV_SEARCH_URL = "https://catalog.data.gov/search"
 
@@ -121,14 +122,42 @@ def extract_column_types(columns):
     return types_
 
 
+def fetch_nyc_json_sample_rows(dataset_id, limit=5):
+    # Uses Socrata JSON API to fetch exactly N rows — much faster than downloading full CSV
+    url = NYC_JSON_RESOURCE_TEMPLATE.format(dataset_id=dataset_id, limit=limit)
+    try:
+        resp = requests.get(url, timeout=30, headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+        rows = resp.json()
+        if not isinstance(rows, list) or not rows:
+            return None, [], []
+        cols = list(rows[0].keys())
+        return None, rows, cols
+    except Exception as e:
+        return str(e), [], []
+
+
 def fetch_csv_sample_rows(url, limit=5):
+    # Streams the CSV and stops after collecting enough lines — avoids downloading the full file
     if not url:
         return None, [], []
 
     try:
-        resp = requests.get(url, timeout=90, headers={"User-Agent": "Mozilla/5.0"})
+        resp = requests.get(url, timeout=30, stream=True, headers={"User-Agent": "Mozilla/5.0"})
         resp.raise_for_status()
-        df = pd.read_csv(StringIO(resp.text), nrows=limit)
+
+        lines = []
+        for line in resp.iter_lines():
+            if line:
+                lines.append(line.decode("utf-8", errors="replace"))
+            if len(lines) >= limit + 1:  # header + limit rows
+                break
+        resp.close()
+
+        if not lines:
+            return None, [], []
+
+        df = pd.read_csv(StringIO("\n".join(lines)))
         rows = df.to_dict(orient="records")
         cols = list(df.columns)
         return None, rows, cols
@@ -151,7 +180,7 @@ def process_partition(rows):
         try:
             if source == "nyc_open_data":
                 detail_url = NYC_VIEW_URL_TEMPLATE.format(dataset_id=dataset_id)
-                detail_resp = session.get(detail_url, timeout=60)
+                detail_resp = session.get(detail_url, timeout=30)
                 detail_resp.raise_for_status()
                 detail = detail_resp.json()
 
@@ -162,7 +191,8 @@ def process_partition(rows):
                 license_name = license_info.get("name") if isinstance(license_info, dict) else None
                 detail_columns = safe_get(detail, "columns", [])
 
-                sample_error, sample_rows, sample_cols = fetch_csv_sample_rows(download_url, limit=5)
+                # Use JSON API instead of CSV for NYC sample rows
+                sample_error, sample_rows, sample_cols = fetch_nyc_json_sample_rows(dataset_id, limit=5)
 
                 out.append({
                     "dataset_id": dataset_id,
@@ -191,6 +221,7 @@ def process_partition(rows):
                 title = summary.get("title") or dcat.get("title")
                 description = summary.get("description") or dcat.get("description")
 
+                # Stream CSV for Data.gov sample rows
                 sample_error, sample_rows, sample_cols = fetch_csv_sample_rows(download_url, limit=5)
 
                 out.append({
@@ -249,13 +280,14 @@ def main():
     combined_index = nyc_index + data_gov_index
     print(f"Total index size: {len(combined_index)}")
 
-    partitions = max(8, math.ceil(len(combined_index) / 10))
+    # Increased partitions for better parallelism across cluster workers
+    partitions = max(40, math.ceil(len(combined_index) / 5))
     rdd = sc.parallelize(combined_index, partitions)
     enriched_rdd = rdd.mapPartitions(process_partition)
 
     df = spark.createDataFrame(enriched_rdd)
 
-    output_path = "hdfs:///user/rbp5812_nyu_edu/data/metadata/combined_metadata_with_samples.parquet"
+    output_path = "hdfs:///user/km6579_nyu_edu/data/metadata/combined_metadata_with_samples.parquet"
     df.write.mode("overwrite").parquet(output_path)
 
     df.groupBy("source").count().show(truncate=False)
