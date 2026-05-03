@@ -6,6 +6,7 @@ __pycache__/
 data/raw/*
 data/profiles/*
 data/descriptions/*
+data/evaluation/*
 data/manual_evaluation_sample.csv
 data/manual_evaluation_sample.xlsx
 data/report_summary_table.csv
