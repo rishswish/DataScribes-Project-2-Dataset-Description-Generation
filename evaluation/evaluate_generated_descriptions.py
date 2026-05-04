@@ -138,11 +138,44 @@ def compute_bertscore_values(
             references,
             lang="en",
             verbose=False,
-            rescale_with_baseline=True,
+            rescale_with_baseline=False,
         )
         return [float(value) for value in f1.tolist()]
     except Exception:
         return [None] * len(references)
+
+
+def finite_values(series: pd.Series) -> List[float]:
+    values: List[float] = []
+    for value in series.dropna().tolist():
+        if isinstance(value, (int, float)) and math.isfinite(value):
+            values.append(float(value))
+    return values
+
+
+def metric_stats(series: pd.Series) -> Dict[str, float]:
+    values = finite_values(series)
+    if not values:
+        return {
+            "valid_count": 0,
+            "valid_rate": 0.0,
+            "mean": float("nan"),
+            "median": float("nan"),
+            "min": float("nan"),
+            "max": float("nan"),
+            "zero_rate": float("nan"),
+        }
+
+    zero_count = sum(1 for value in values if value == 0.0)
+    return {
+        "valid_count": len(values),
+        "valid_rate": len(values) / len(series) if len(series) else 0.0,
+        "mean": sum(values) / len(values),
+        "median": float(pd.Series(values).median()),
+        "min": min(values),
+        "max": max(values),
+        "zero_rate": zero_count / len(values),
+    }
 
 
 def extract_salient_terms(text: str, limit: int) -> List[str]:
@@ -317,6 +350,8 @@ def compute_row_metrics(df: pd.DataFrame) -> pd.DataFrame:
 
 def summarize_subset(df: pd.DataFrame, label: str) -> Dict[str, float]:
     successful = df[df["has_generated_description"]]
+    meteor_stats = metric_stats(successful["meteor"])
+    bertscore_stats = metric_stats(successful["bertscore_f1"])
     return {
         "segment": label,
         "row_count": int(len(df)),
@@ -328,9 +363,41 @@ def summarize_subset(df: pd.DataFrame, label: str) -> Dict[str, float]:
         "avg_rouge1_f1": float(successful["rouge1_f1"].mean()) if len(successful) else 0.0,
         "avg_rouge2_f1": float(successful["rouge2_f1"].mean()) if len(successful) else 0.0,
         "avg_rougeL_f1": float(successful["rougeL_f1"].mean()) if len(successful) else 0.0,
-        "avg_meteor": float(successful["meteor"].dropna().mean()) if len(successful["meteor"].dropna()) else float("nan"),
-        "avg_bertscore_f1": float(successful["bertscore_f1"].dropna().mean()) if len(successful["bertscore_f1"].dropna()) else float("nan"),
+        "avg_meteor": meteor_stats["mean"],
+        "avg_bertscore_f1": bertscore_stats["mean"],
+        "meteor_valid_count": meteor_stats["valid_count"],
+        "meteor_valid_rate": meteor_stats["valid_rate"],
+        "meteor_median": meteor_stats["median"],
+        "meteor_min": meteor_stats["min"],
+        "meteor_max": meteor_stats["max"],
+        "meteor_zero_rate": meteor_stats["zero_rate"],
+        "bertscore_valid_count": bertscore_stats["valid_count"],
+        "bertscore_valid_rate": bertscore_stats["valid_rate"],
+        "bertscore_median": bertscore_stats["median"],
+        "bertscore_min": bertscore_stats["min"],
+        "bertscore_max": bertscore_stats["max"],
     }
+
+
+def metric_display(value: float) -> str:
+    if pd.isna(value):
+        return "unavailable"
+    return f"{value:.4f}"
+
+
+def build_suspicious_metric_notes(overall: pd.Series) -> List[str]:
+    notes: List[str] = []
+    if overall["meteor_valid_count"] == 0:
+        notes.append("METEOR produced no valid scores.")
+    elif pd.notna(overall["meteor_zero_rate"]) and overall["meteor_zero_rate"] >= 0.95:
+        notes.append("METEOR is near-zero on almost every scored row, which suggests the configuration may still need validation.")
+
+    if overall["bertscore_valid_count"] == 0:
+        notes.append("BERTScore produced no valid scores.")
+    elif pd.notna(overall["avg_bertscore_f1"]) and overall["avg_bertscore_f1"] < 0.30:
+        notes.append("BERTScore is unusually low for semantically related summaries, so the model settings should be sanity-checked against example rows.")
+
+    return notes
 
 
 def write_markdown_report(
@@ -342,14 +409,7 @@ def write_markdown_report(
 ) -> None:
     overall = summaries[summaries["segment"] == "overall"].iloc[0]
     overall_retrieval = retrieval_df[retrieval_df["segment"] == "overall"].set_index("corpus")
-
-    meteor_value = "unavailable"
-    if pd.notna(overall["avg_meteor"]):
-        meteor_value = f"{overall['avg_meteor']:.4f}"
-
-    bertscore_value = "unavailable"
-    if pd.notna(overall["avg_bertscore_f1"]):
-        bertscore_value = f"{overall['avg_bertscore_f1']:.4f}"
+    suspicious_notes = build_suspicious_metric_notes(overall)
 
     lines = [
         "# Generated Description Evaluation Report",
@@ -363,12 +423,18 @@ def write_markdown_report(
         f"- Average ROUGE-1 F1: {overall['avg_rouge1_f1']:.4f}",
         f"- Average ROUGE-2 F1: {overall['avg_rouge2_f1']:.4f}",
         f"- Average ROUGE-L F1: {overall['avg_rougeL_f1']:.4f}",
-        f"- Average METEOR: {meteor_value}",
-        f"- Average BERTScore F1: {bertscore_value}",
+        f"- Average METEOR: {metric_display(overall['avg_meteor'])}",
+        f"- Average BERTScore F1: {metric_display(overall['avg_bertscore_f1'])}",
         "",
-        "## Metric Availability",
+        "## Metric Coverage",
         f"- METEOR available: {metric_availability['meteor_available']}",
+        f"- METEOR valid rows: {int(overall['meteor_valid_count'])}",
+        f"- METEOR valid-row rate: {overall['meteor_valid_rate']:.2%}",
+        f"- METEOR median/min/max: {metric_display(overall['meteor_median'])} / {metric_display(overall['meteor_min'])} / {metric_display(overall['meteor_max'])}",
         f"- BERTScore available: {metric_availability['bertscore_available']}",
+        f"- BERTScore valid rows: {int(overall['bertscore_valid_count'])}",
+        f"- BERTScore valid-row rate: {overall['bertscore_valid_rate']:.2%}",
+        f"- BERTScore median/min/max: {metric_display(overall['bertscore_median'])} / {metric_display(overall['bertscore_min'])} / {metric_display(overall['bertscore_max'])}",
         "",
         "## Retrieval Proxy",
         "Pseudo-queries are built from dataset titles plus salient terms from the original descriptions.",
@@ -384,7 +450,10 @@ def write_markdown_report(
         lines.append(f"- METEOR import note: {metric_availability['meteor_import_error']}")
     if metric_availability["bertscore_import_error"]:
         lines.append(f"- BERTScore import note: {metric_availability['bertscore_import_error']}")
-    if metric_availability["meteor_import_error"] or metric_availability["bertscore_import_error"]:
+    if suspicious_notes:
+        for note in suspicious_notes:
+            lines.append(f"- Quality metric note: {note}")
+    if metric_availability["meteor_import_error"] or metric_availability["bertscore_import_error"] or suspicious_notes:
         lines.append("")
         lines.append("## Errors")
 
@@ -400,19 +469,19 @@ def write_markdown_report(
         "",
         "## By Source",
         "",
-        "| Segment | Success Rate | ROUGE-1 | ROUGE-2 | ROUGE-L | METEOR | BERTScore F1 | Avg Generated Chars |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| Segment | Success Rate | ROUGE-1 | ROUGE-2 | ROUGE-L | METEOR | METEOR Valid | BERTScore F1 | BERTScore Valid | Avg Generated Chars |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ])
 
     for _, row in summaries.iterrows():
         if row["segment"] == "overall":
             continue
-        meteor_cell = f"{row['avg_meteor']:.4f}" if pd.notna(row["avg_meteor"]) else "unavailable"
-        bertscore_cell = f"{row['avg_bertscore_f1']:.4f}" if pd.notna(row["avg_bertscore_f1"]) else "unavailable"
         lines.append(
             f"| {row['segment']} | {row['generation_success_rate']:.2%} | "
             f"{row['avg_rouge1_f1']:.4f} | {row['avg_rouge2_f1']:.4f} | "
-            f"{row['avg_rougeL_f1']:.4f} | {meteor_cell} | {bertscore_cell} | "
+            f"{row['avg_rougeL_f1']:.4f} | {metric_display(row['avg_meteor'])} | "
+            f"{int(row['meteor_valid_count'])} | {metric_display(row['avg_bertscore_f1'])} | "
+            f"{int(row['bertscore_valid_count'])} | "
             f"{row['avg_generated_char_len']:.1f} |"
         )
 
