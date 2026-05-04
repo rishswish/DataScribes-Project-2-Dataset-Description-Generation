@@ -166,12 +166,26 @@ Reads the metadata parquet from HDFS, applies Spark UDFs to compute per-column s
 
 ### Stage 3 — LLM Generation (DataProc)
 
+The `anthropic` package must be bundled and shipped to worker nodes before running this stage. `pip install anthropic` on the master node only installs it there — the worker nodes (`nyu-dataproc-w-0`, `nyu-dataproc-w-1`) are separate machines and would throw `ModuleNotFoundError`. NYU's cluster does not allow direct SSH into workers, so the fix is to zip the package and pass it via `--archives`, which tells Spark to ship it to every worker automatically.
+
 ```bash
-# Set your Anthropic API key first
+# 1. Install the package into a local folder
+pip install anthropic -t ~/anthropic_pkg
+
+# 2. Zip it so Spark can distribute it
+cd ~
+zip -r anthropic_pkg.zip anthropic_pkg/
+
+# 3. Set your Anthropic API key
 export ANTHROPIC_API_KEY=<your-key>
 
-spark-submit ~/scripts/dataproc_generate_descriptions.py
+# 4. Submit — --archives ships the zip to every worker and extracts it as "anthropic_pkg/"
+spark-submit \
+  --archives ~/anthropic_pkg.zip#anthropic_pkg \
+  ~/scripts/dataproc_generate_descriptions.py
 ```
+
+Inside `generate_description_for_partition()`, `sys.path.insert(0, "anthropic_pkg")` tells each worker where to find the extracted package (see [scripts/dataproc_generate_descriptions.py](scripts/dataproc_generate_descriptions.py)).
 
 Calls `claude-sonnet-4-5` via the Anthropic API using `mapPartitions` across 10 partitions. Builds one structured prompt per dataset from title, description, keywords, column profiles, and a sample row.
 
