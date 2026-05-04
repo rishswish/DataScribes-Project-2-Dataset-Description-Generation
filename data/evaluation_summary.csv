@@ -1,4 +1,4 @@
-source,total_datasets,successful,failed,success_rate_pct,avg_original_words,avg_generated_words,avg_generated_sentences,pct_follows_3_5_sentences,avg_novelty_score,pct_title_covered
-data_gov,100.0,100.0,0.0,100.0,118.5,98.8,5.12,59.0,0.65,98.0
-nyc_open_data,100.0,96.0,4.0,96.0,90.4,104.7,4.29,88.5,0.696,100.0
-OVERALL,200.0,196.0,4.0,98.0,104.5,101.7,4.71,73.5,0.672,99.0
+total_datasets,successful,failed,success_rate_pct,avg_original_words,avg_generated_words,avg_generated_sentences,pct_follows_3_5_sentences,avg_novelty_score,pct_title_covered,source
+100.0,100.0,0.0,100.0,118.5,98.8,5.12,59.0,0.65,98.0,data_gov
+100.0,96.0,4.0,96.0,90.4,104.7,4.29,88.5,0.696,100.0,nyc_open_data
+200.0,196.0,4.0,98.0,104.5,101.7,4.71,73.5,0.672,99.0,OVERALL

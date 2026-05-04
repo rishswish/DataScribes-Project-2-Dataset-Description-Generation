@@ -119,8 +119,6 @@ def main():
     print(f"Saved per-row results to data/evaluation_results.csv ({len(results)} rows)")
 
     # ── Summary table ────────────────────────────────────────────────────────
-    success_df = df[df["success"]]
-
     def summarise(group):
         return pd.Series({
             "total_datasets": len(group),
@@ -135,10 +133,15 @@ def main():
             "pct_title_covered": round(group[group["success"]]["title_coverage"].mean() * 100, 1),
         })
 
-    summary = df.groupby("source").apply(summarise).reset_index()
+    summary_rows = []
+    for source, group in df.groupby("source", sort=True):
+        row = summarise(group).to_dict()
+        row["source"] = source
+        summary_rows.append(row)
+
     overall = summarise(df)
     overall["source"] = "OVERALL"
-    summary = pd.concat([summary, pd.DataFrame([overall])], ignore_index=True)
+    summary = pd.concat([pd.DataFrame(summary_rows), pd.DataFrame([overall])], ignore_index=True)
 
     summary.to_csv(output_dir / "evaluation_summary.csv", index=False)
 

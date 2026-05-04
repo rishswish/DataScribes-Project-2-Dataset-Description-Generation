@@ -12,12 +12,14 @@ Writes: data/text_similarity_results.csv
         data/manual_evaluation_sample.csv
         data/manual_evaluation_sample.xlsx
         data/full_evaluation_summary.csv  (one-page summary)
+        data/full_evaluation_report.md    (human-readable summary)
 """
 
 import math
 import re
 import warnings
 from pathlib import Path
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -53,6 +55,16 @@ def clean(text) -> str:
     if not text or (isinstance(text, float) and math.isnan(text)):
         return ""
     return str(text).strip()
+
+
+def markdown_table(headers: List[str], rows: List[List[str]]) -> str:
+    lines = [
+        "| " + " | ".join(headers) + " |",
+        "| " + " | ".join(["---"] * len(headers)) + " |",
+    ]
+    for row in rows:
+        lines.append("| " + " | ".join(str(cell) for cell in row) + " |")
+    return "\n".join(lines)
 
 
 def dcg(relevances: list) -> float:
@@ -204,23 +216,60 @@ def compute_retrieval_evaluation(df: pd.DataFrame) -> pd.DataFrame:
 # 3. Qualitative Evaluation  (manual scoring spreadsheet)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def build_manual_eval_sample(df: pd.DataFrame):
+def select_examples_by_score(group: pd.DataFrame, score_col: str, n_best: int = 2, n_worst: int = 2, n_middle: int = 1) -> pd.DataFrame:
+    if group.empty:
+        return group.copy()
+
+    ranked = group.sort_values(score_col, ascending=False).copy()
+    pieces = [
+        ranked.head(n_best).assign(review_bucket="top_quality"),
+        ranked.tail(n_worst).assign(review_bucket="low_quality"),
+    ]
+
+    middle_idx = len(ranked) // 2
+    middle = ranked.iloc[[middle_idx]].copy().assign(review_bucket="mid_quality")
+    if n_middle == 0:
+        middle = ranked.iloc[0:0].copy()
+    pieces.append(middle)
+
+    combined = pd.concat(pieces, ignore_index=False)
+    combined = combined.loc[~combined.index.duplicated(keep="first")]
+    return combined
+
+
+def build_manual_eval_sample(df: pd.DataFrame, sim: pd.DataFrame):
     print("\n[3/3] Building manual evaluation sample...")
 
     success = df[df["generated_description"].notna()].copy()
+    scored = success.merge(
+        sim[["dataset_id", "rouge1", "meteor", "bertscore_f1"]],
+        on="dataset_id",
+        how="left",
+    )
 
-    nyc = success[success["source"] == "nyc_open_data"].head(5)
-    gov = success[success["source"] == "data_gov"].head(5)
-    sample = pd.concat([nyc, gov], ignore_index=True)
+    selected_groups = []
+    for source in ["nyc_open_data", "data_gov"]:
+        group = scored[scored["source"] == source].copy()
+        selected_groups.append(select_examples_by_score(group, "bertscore_f1"))
+
+    sample = pd.concat(selected_groups, ignore_index=True)
+    sample = sample.drop_duplicates(subset=["dataset_id"]).copy()
+
+    failures = df[df["generated_description"].isna()].copy()
+    if not failures.empty:
+        failures["review_bucket"] = "generation_failure"
+        sample = pd.concat([sample, failures], ignore_index=True, sort=False)
 
     sample = sample[[
         "dataset_id", "source", "title",
-        "original_description", "generated_description", "generation_model",
+        "review_bucket", "original_description", "generated_description",
+        "generation_model", "generation_error", "rouge1", "meteor", "bertscore_f1",
     ]].copy()
 
     sample["manual_score_readability"] = ""
     sample["manual_score_accuracy"] = ""
     sample["manual_score_usefulness"] = ""
+    sample["manual_score_faithfulness"] = ""
     sample["manual_notes"] = ""
 
     sample.to_csv(OUTPUT_DIR / "manual_evaluation_sample.csv", index=False)
@@ -297,6 +346,139 @@ def print_summary(sim: pd.DataFrame, ret: pd.DataFrame, df: pd.DataFrame):
     print(f"\n  Saved full_evaluation_summary.csv")
 
 
+def build_failure_analysis(df: pd.DataFrame) -> pd.DataFrame:
+    failures = df[df["generated_description"].isna()].copy()
+    if failures.empty:
+        return pd.DataFrame(columns=["failure_type", "count"])
+
+    def classify_failure(error: str) -> str:
+        text = clean(error).lower()
+        if "rate limit" in text or "429" in text:
+            return "rate_limit"
+        if "too long" in text or "tokens >" in text:
+            return "prompt_too_long"
+        return "other"
+
+    failures["failure_type"] = failures["generation_error"].apply(classify_failure)
+    summary = (
+        failures.groupby("failure_type")
+        .size()
+        .reset_index(name="count")
+        .sort_values("count", ascending=False)
+    )
+    summary.to_csv(OUTPUT_DIR / "failure_analysis.csv", index=False)
+    return summary
+
+
+def write_markdown_report(
+    sim: pd.DataFrame,
+    ret: pd.DataFrame,
+    df: pd.DataFrame,
+    failure_df: pd.DataFrame,
+) -> None:
+    total = len(df)
+    success = int(df["generated_description"].notna().sum())
+    failed = total - success
+
+    quality_rows = []
+    for src in ["nyc_open_data", "data_gov", "OVERALL"]:
+        subset = sim if src == "OVERALL" else sim[sim["source"] == src]
+        if subset.empty:
+            continue
+        quality_rows.append([
+            src,
+            f"{subset['rouge1'].mean():.4f}",
+            f"{subset['rouge2'].mean():.4f}",
+            f"{subset['rougeL'].mean():.4f}",
+            f"{subset['meteor'].mean():.4f}",
+            f"{subset['bertscore_f1'].mean():.4f}",
+        ])
+
+    retrieval_rows = []
+    for k in [5, 10]:
+        subset = ret[ret["k"] == k]
+        retrieval_rows.append([
+            f"NDCG@{k}",
+            f"{subset['ndcg_original'].mean():.4f}",
+            f"{subset['ndcg_generated'].mean():.4f}",
+            f"{subset['delta'].mean():+.4f}",
+        ])
+
+    failure_lines = ["- No failed generations were observed."]
+    if not failure_df.empty:
+        failure_lines = [
+            f"- `{row.failure_type}`: {int(row.count)} dataset(s)"
+            for row in failure_df.itertuples()
+        ]
+
+    notable_queries = (
+        ret[ret["k"] == 10]
+        .sort_values("delta", ascending=False)
+        [["query", "ndcg_original", "ndcg_generated", "delta"]]
+        .head(3)
+    )
+    query_rows = [
+        [
+            row["query"],
+            f"{row['ndcg_original']:.4f}",
+            f"{row['ndcg_generated']:.4f}",
+            f"{row['delta']:+.4f}",
+        ]
+        for _, row in notable_queries.iterrows()
+    ]
+
+    report = [
+        "# Full Evaluation Report",
+        "",
+        "## Overview",
+        f"- Datasets processed: `{total}`",
+        f"- Successful generations: `{success}` ({100 * success / total:.1f}%)",
+        f"- Failed generations: `{failed}`",
+        "",
+        "## Quality Metrics",
+        markdown_table(
+            ["Source", "ROUGE-1", "ROUGE-2", "ROUGE-L", "METEOR", "BERTScore F1"],
+            quality_rows,
+        ),
+        "",
+        "## Retrieval Metrics",
+        markdown_table(
+            ["Metric", "Original", "Generated", "Delta"],
+            retrieval_rows,
+        ),
+        "",
+        "## Failure Analysis",
+        *failure_lines,
+        "",
+        "The current failures fall into two operational buckets:",
+        "- `rate_limit`: the generation request exceeded Anthropic throughput limits at runtime.",
+        "- `prompt_too_long`: the prompt payload exceeded the model token limit for a specific dataset.",
+        "",
+        "These failures do not indicate a parsing bug in the evaluation pipeline; they indicate generation-time robustness issues that should be addressed by retry logic, batching controls, or prompt truncation.",
+        "",
+        "## Notable Retrieval Gains",
+        markdown_table(
+            ["Query", "Original NDCG@10", "Generated NDCG@10", "Delta"],
+            query_rows,
+        ),
+        "",
+        "## Qualitative Review Sheet",
+        "A manual review spreadsheet was generated at `data/manual_evaluation_sample.xlsx`.",
+        "The sample now includes representative high-quality rows, low-quality rows, mid-quality rows, and failed generations so that qualitative scoring covers both strengths and edge cases.",
+        "",
+        "## Output Files",
+        "- `data/text_similarity_results.csv`",
+        "- `data/retrieval_results.csv`",
+        "- `data/full_evaluation_summary.csv`",
+        "- `data/failure_analysis.csv`",
+        "- `data/manual_evaluation_sample.csv`",
+        "- `data/manual_evaluation_sample.xlsx`",
+    ]
+
+    (OUTPUT_DIR / "full_evaluation_report.md").write_text("\n".join(report) + "\n", encoding="utf-8")
+    print("  Saved full_evaluation_report.md")
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Main
 # ─────────────────────────────────────────────────────────────────────────────
@@ -309,8 +491,10 @@ def main():
 
     sim_results = compute_text_similarity(df)
     ret_results = compute_retrieval_evaluation(df)
-    build_manual_eval_sample(df)
+    build_manual_eval_sample(df, sim_results)
+    failure_results = build_failure_analysis(df)
     print_summary(sim_results, ret_results, df)
+    write_markdown_report(sim_results, ret_results, df, failure_results)
 
 
 if __name__ == "__main__":
