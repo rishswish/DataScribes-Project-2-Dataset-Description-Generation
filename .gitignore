@@ -6,11 +6,19 @@ __pycache__/
 data/raw/*
 data/profiles/*
 data/descriptions/*
+data/evaluation/*
 data/manual_evaluation_sample.csv
 data/manual_evaluation_sample.xlsx
 data/report_summary_table.csv
 data/report_summary_table.xlsx
 data/final_dataset_description_results.parquet
+data/evaluation_results.csv
+data/evaluation_summary.csv
+data/failure_analysis.csv
+data/full_evaluation_report.md
+data/full_evaluation_summary.csv
+data/retrieval_results.csv
+data/text_similarity_results.csv
 
 !data/metadata/
 !data/metadata/combined_metadata_with_samples.parquet
@@ -23,3 +31,13 @@ data/notebook_output/
 
 # macOS
 .DS_Store
+
+# Google Cloud SDK
+gcloud init/
+google-cloud-sdk/
+
+# Generated CSV from DataProc parquet output
+data/generated_descriptions_all_200.csv
+
+# Claude Code internal files
+.claude/
