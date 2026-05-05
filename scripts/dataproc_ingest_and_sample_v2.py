@@ -306,7 +306,7 @@ def main():
 
     df = spark.createDataFrame(enriched_rdd, schema=schema)
 
-    output_path = "hdfs:///user/km6579_nyu_edu/data/metadata/combined_metadata_with_samples_v2.parquet"
+    output_path = "hdfs:///user/at6370_nyu_edu/data/metadata/combined_metadata_with_samples_v2.parquet"
     df.write.mode("overwrite").parquet(output_path)
 
     df.groupBy("source").count().show(truncate=False)

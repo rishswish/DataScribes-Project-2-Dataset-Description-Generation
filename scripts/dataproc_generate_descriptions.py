@@ -97,8 +97,8 @@ def main():
 
     spark = SparkSession.builder.appName("DataprocGenerateDescriptions").getOrCreate()
 
-    input_path = "hdfs:///user/km6579_nyu_edu/data/profiles/combined_profiles_spark_v2.parquet"
-    output_path = "hdfs:///user/km6579_nyu_edu/data/descriptions/generated_descriptions_sonnet.parquet"
+    input_path = "hdfs:///user/at6370_nyu_edu/data/profiles/combined_profiles_spark_v2.parquet"
+    output_path = "hdfs:///user/at6370_nyu_edu/data/descriptions/generated_descriptions_sonnet.parquet"
 
     df = spark.read.parquet(input_path)
     print(f"Loaded {df.count()} rows from profiles")
