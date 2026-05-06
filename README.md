@@ -1,6 +1,6 @@
 # 📊 Scalable Dataset Description Generation for Open Data Repositories
 
-**Team DataScribes** | Big Data Course Project | NYU Center for Data Science 
+**Team DataScribes** | Data Engineering Course Project | NYU Center for Data Science 
 
 <div align="center">
   <p>
