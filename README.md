@@ -202,7 +202,7 @@ Then open `http://localhost:8888` and run `notebooks/autoddg_pipeline_hpc.ipynb`
 
 ## Course Information
 
-- **Course**: Big Data 
+- **Course**: Data Engineering
 - **Instructor**: Professor Juliana Freire
 - **Section Leader**: Dr. Christos Koutras
 - **Team**: DataScribes
