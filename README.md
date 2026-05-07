@@ -83,33 +83,67 @@ MAX_LINES           = 20        # Max lines sent to LLM
 | Metric | Value |
 |--------|-------|
 | Datasets requested | 400 |
-| Datasets successfully described | 227 |
+| Datasets successfully described | 232 |
 | NYC Open Data success rate | 95% |
 | Data.gov success rate | 45% (many lack CSV links) |
 
 ### Evaluation Results
 
 #### Text Similarity Metrics
-| Metric | Score | Description |
-|--------|-------|-------------|
-| ROUGE-1 | 0.2448 | Unigram overlap with original descriptions |
-| ROUGE-2 | 0.0454 | Bigram overlap |
-| ROUGE-L | 0.1438 | Longest common subsequence |
-| METEOR | 0.1622 | Overlap accounting for synonyms |
-| BERTScore F1 | 0.7352 | Deep semantic similarity |
+Evaluated on 203 datasets with both original and generated descriptions (n = 203).
 
-#### Per-Source Breakdown
-| Source | ROUGE-1 | ROUGE-2 | ROUGE-L | METEOR | BERTScore F1 |
-|--------|---------|---------|---------|--------|--------------|
-| Data.gov | 0.2611 | 0.0590 | 0.1553 | 0.1626 | 0.7529 |
-| NYC Open Data | 0.2375 | 0.0393 | 0.1387 | 0.1620 | 0.7274 |
+| Metric | Generated vs Original | Description |
+|--------|----------------------|-------------|
+| ROUGE-1 | 0.2438 | Unigram overlap with original descriptions |
+| ROUGE-2 | 0.0436 | Bigram overlap |
+| ROUGE-L | 0.1435 | Longest common subsequence |
+| METEOR | 0.1636 | Overlap accounting for synonyms |
+
+> Low ROUGE/METEOR scores are expected: LLM-generated text naturally uses different phrasing than human-written originals. These metrics penalize paraphrasing even when the meaning is equivalent.
 
 #### Retrieval Evaluation (NDCG@10)
-| | Generated | Original |
-|---|---|---|
-| Average NDCG@10 | 0.1587 | 0.1840 |
+Simulates a dataset search engine scenario across 8 test queries.
 
-> The high BERTScore (0.735) confirms that generated descriptions are semantically equivalent to human-written originals despite using different wording — which is expected behavior for LLM-generated text.
+| | Generated | Search Desc | Original |
+|---|---|---|---|
+| Average NDCG@10 | 0.1502 | 0.1938 | 0.1691 |
+
+Search descriptions score highest as expected — they are keyword-rich by design. Generated (user-facing) descriptions are competitive with originals overall and outperform them on some queries (e.g., bicycle/pedestrian counts: 0.1324 vs 0.0454).
+
+#### AutoDDG Intrinsic Quality Evaluation
+GPT-4o-mini scores each generated description independently on three dimensions (no reference needed). Evaluated across all 207 successfully generated descriptions.
+
+| Dimension | Avg Score (out of 10) |
+|-----------|----------------------|
+| Completeness | 7.26 |
+| Conciseness | 8.13 |
+| Readability | 7.99 |
+| **Overall** | **7.79** |
+
+#### AutoDDG Pairwise Evaluation
+GPT-4o-mini acts as a judge, directly comparing generated descriptions head-to-head against human-written originals (201 pairs with substantive original descriptions > 50 characters).
+
+| | Count | Share |
+|---|---|---|
+| Generated wins | 192 | 95.5% |
+| Original wins | 9 | 4.5% |
+
+**Breakdown by source:**
+
+| Source | Generated Wins | Original Wins |
+|--------|---------------|---------------|
+| NYC Open Data | 131 | 6 |
+| Data.gov | 61 | 3 |
+
+#### ELO Ratings
+Tournament-style aggregate performance across all 201 pairwise comparisons (baseline: 1500).
+
+| | ELO Rating |
+|---|---|
+| Generated descriptions | **1514.6** |
+| Original descriptions | 1485.4 |
+
+> Generated descriptions outperform human-written originals in 95.5% of head-to-head comparisons, achieving a higher ELO rating across both sources. The intrinsic scores confirm the descriptions are consistently complete, concise, and readable — including for the many datasets that had no original description at all.
 
 ---
 
